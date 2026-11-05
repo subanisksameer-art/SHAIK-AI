@@ -1,0 +1,73 @@
+<thead>
+  <tr>
+    <th>Step</th>
+    <th>Scanned (R &rarr; L)</th>
+    <th>Action / Computation</th>
+    <th>Stack (Bottom &rarr; Top)</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>1</td>
+    <td><code>1</code></td>
+    <td>Push 1</td>
+    <td><code>[1]</code></td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><code>4</code></td>
+    <td>Push 4</td>
+    <td><code>[1, 4]</code></td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><code>-</code></td>
+    <td><code>op1 = 4, op2 = 1 &rarr; 4 - 1 = 3</code>, Push 3</td>
+    <td><code>[3]</code></td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td><code>3</code></td>
+    <td>Push 3</td>
+    <td><code>[3, 3]</code></td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td><code>2</code></td>
+    <td>Push 2</td>
+    <td><code>[3, 3, 2]</code></td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td><code>+</code></td>
+    <td><code>op1 = 2, op2 = 3 &rarr; 2 + 3 = 5</code>, Push 5</td>
+    <td><code>[3, 5]</code></td>
+  </tr>
+  <tr class="highlight-row">
+    <td>7</td>
+    <td><code>*</code></td>
+    <td><code>op1 = 5, op2 = 3 &rarr; 5 * 3 = 15</code>, Push 15</td>
+    <td><code>[15]</code></td>
+  </tr>
+</tbody>
+</table>
+<div class="result-box">Final Result = 15</div>
+<div class="callout" style="background:#eff6ff; border-left-color: #2563eb; margin-top: 14px;">
+  <strong>Exam Success Checklist:</strong>
+  <ul>
+    <li>&check; <strong>Always show 4 to 5 columns:</strong> Step, Scanned Token, Stack Status, and Output/Action.</li>
+    <li>&check; <strong>First popped vs Second popped:</strong>
+      <ul>
+        <li>In <strong>Postfix</strong>: 1st popped is <code>op2</code>, 2nd popped is <code>op1</code> &rarr; compute
+          <code>op1 - op2</code> or <code>op1 / op2</code>.</li>
+        <li>In <strong>Prefix</strong> (scanned R&rarr;L): 1st popped is <code>op1</code>, 2nd popped is
+          <code>op2</code> &rarr; compute <code>op1 - op2</code>.</li>
+      </ul>
+    </li>
+    <li>&check; <strong>Parentheses:</strong> An open bracket <code>'('</code> inside the stack has the lowest
+      precedence; it is only removed when a closing bracket <code>')'</code> is encountered.</li>
+  </ul>
+</div>
+</body>
+
+</html>
