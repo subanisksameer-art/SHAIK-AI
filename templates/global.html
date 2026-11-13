@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHAIK-AI — Voice Assistant</title>
+<meta name="description" content="SHAIK-AI: Free voice-controlled AI assistant. Open websites, search the web, send WhatsApp messages and more — all by voice.">
+<style>
+:root {
+  --bg:      #0d1117;
+  --card:    #161b22;
+  --border:  #30363d;
+  --blue:    #58a6ff;
+  --green:   #3fb950;
+  --red:     #f85149;
+  --text:    #c9d1d9;
+  --muted:   #8b949e;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────── */
+header {
+  background: linear-gradient(135deg, #161b22, #21262d);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.logo { display:flex; align-items:center; gap:12px; }
+.logo h1 { font-size:1.5rem; color:var(--blue); letter-spacing:1px; }
+.logo p  { font-size:0.8rem; color:var(--muted); }
+.live { display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--green); }
+.dot  { width:8px; height:8px; background:var(--green); border-radius:50%; animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── Main ────────────────────────────────────────── */
+main {
+  flex:1;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  width: 100%;
+}
+
+/* ── Mic Button ──────────────────────────────────── */
+.mic-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.mic-btn {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  border: 3px solid var(--blue);
+  background: var(--card);
+  color: var(--blue);
+  font-size: 2.4rem;
+  cursor: pointer;
+  transition: all .3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(88,166,255,.2);
+}
+.mic-btn:hover  { background: #1f2937; box-shadow: 0 0 30px rgba(88,166,255,.4); }
+.mic-btn.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  animation: ripple 1s infinite;
+}
+@keyframes ripple {
+  0%   { box-shadow: 0 0 0 0 rgba(248,81,73,.5); }
+  70%  { box-shadow: 0 0 0 20px rgba(248,81,73,0); }
+  100% { box-shadow: 0 0 0 0 rgba(248,81,73,0); }
+}
+.mic-label { margin-top: 12px; color: var(--muted); font-size:.9rem; }
+.mic-btn.active + .mic-label { color: var(--red); }
+
+/* ── Text Input ──────────────────────────────────── */
+.input-row {
+  display:flex; gap:10px; margin-bottom:24px;
+}
+#cmd { 
+  flex:1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color .2s;
+}
+#cmd:focus { border-color: var(--blue); }
+.send-btn {
+  padding: 14px 22px;
+  background: #238636;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size:.95rem;
+  font-weight:600;
+  cursor:pointer;
+  transition: background .2s;
+}
+.send-btn:hover { background: #2ea043; }
+
+/* ── Status / Result ─────────────────────────────── */
+#status {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  min-height: 60px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:.95rem;
+}
+#status .icon { font-size:1.4rem; }
+#status .msg  { color: var(--green); }
+#status .err  { color: var(--red); }
+#status .info { color: var(--muted); }
+
+/* ── Quick Commands ──────────────────────────────── */
+.section-title { color: var(--blue); font-size:.9rem; font-weight:600; margin-bottom:12px; text-transform:uppercase; letter-spacing:.5px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+.chip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 7px 15px;
+  font-size:.82rem;
+  cursor:pointer;
+  transition: all .2s;
+  user-select:none;
+}
+.chip:hover { border-color:var(--blue); color:var(--blue); background:#1f2a3a; }
+.chip:active { transform:scale(.96); }
+
+/* ── History ─────────────────────────────────────── */
+#history { list-style:none; }
+#history li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:.85rem;
+  cursor:pointer;
+  transition: border-color .2s;
+}
+#history li:hover { border-color: var(--blue); }
+.h-cmd { color: var(--text); }
+.h-res { color: var(--green); font-size:.78rem; }
+
+/* ── Footer ──────────────────────────────────────── */
+footer {
+  text-align:center;
+  padding: 20px;
+  color: var(--muted);
+  font-size:.8rem;
+  border-top: 1px solid var(--border);
+}
+footer a { color:var(--blue); text-decoration:none; }
+
+/* ── Mobile ──────────────────────────────────────── */
+@media(max-width:500px) {
+  .mic-btn { width:90px; height:90px; font-size:2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <span style="font-size:1.8rem">🤖</span>
+    <div>
+      <h1>SHAIK-AI</h1>
+      <p>Personal Voice OS Assistant</p>
+    </div>
+  </div>
+  <div class="live"><div class="dot"></div> Live</div>
+</header>
+
+<main>
+
+  <!-- Mic Button -->
+  <div class="mic-section">
+    <button class="mic-btn" id="micBtn" title="Click and speak">🎤</button>
+    <p class="mic-label" id="micLabel">Click mic and speak your command</p>
+  </div>
+
+  <!-- Text Input -->
+  <div class="input-row">
+    <input id="cmd" type="text" placeholder='Or type: "open YouTube", "search cricket score", "what time is it"...' />
+    <button class="send-btn" onclick="send()">Send ▶</button>
+  </div>
+
+  <!-- Status / Result -->
+  <div id="status">
+    <span class="icon">💬</span>
+    <span class="info" id="statusMsg">Say a command or type below...</span>
+  </div>
+
+  <!-- Quick Commands -->
+  <div class="section-title">⚡ Quick Commands</div>
+  <div class="chips">
+    <span class="chip" onclick="run('open YouTube')">▶️ YouTube</span>
+    <span class="chip" onclick="run('open Gmail')">📧 Gmail</span>
+    <span class="chip" onclick="run('open GitHub')">🐙 GitHub</span>
+    <span class="chip" onclick="run('open WhatsApp')">💬 WhatsApp</span>
+    <span class="chip" onclick="run('open Spotify')">🎵 Spotify</span>
+    <span class="chip" onclick="run('open Netflix')">🎬 Netflix</span>
+    <span class="chip" onclick="run('open Google Maps')">🗺️ Maps</span>
+    <span class="chip" onclick="run('open Google Drive')">☁️ Drive</span>
+    <span class="chip" onclick="run('open Google Meet')">📹 Meet</span>
+    <span class="chip" onclick="run('open Google Docs')">📄 Docs</span>
+    <span class="chip" onclick="run('search cricket score today')">🏏 Cricket</span>
+    <span class="chip" onclick="run('search latest news')">📰 News</span>
+    <span class="chip" onclick="run('what time is it')">🕐 Time</span>
+    <span class="chip" onclick="run(\"what is today's date\")">📅 Date</span>
+    <span class="chip" onclick="run('weather in Hyderabad')">🌤️ Weather</span>
+    <span class="chip" onclick="run('tell me a joke')">😄 Joke</span>
+    <span class="chip" onclick="run('open ChatGPT')">🤖 ChatGPT</span>
+    <span class="chip" onclick="run('open translate')">🌐 Translate</span>
+    <span class="chip" onclick="run('open Amazon')">🛒 Amazon</span>
+    <span class="chip" onclick="run('open Flipkart')">🛍️ Flipkart</span>
+  </div>
+
+  <!-- History -->
+  <div class="section-title">🕘 History</div>
+  <ul id="history"><li style="color:var(--muted);border:none;cursor:default">No commands yet.</li></ul>
+
+</main>
+
+<footer>
+  SHAIK-AI — Free & Open Source &nbsp;|&nbsp;
+  <a href="https://github.com/subanisksameer-art/SHAIK-AI" target="_blank">⭐ GitHub</a>
+  &nbsp;|&nbsp; Made with ❤️ by Shaik
+</footer>
+
+<script>
+  const history = [];
+
+  // ── Voice ───────────────────────────────────────────────────────────────────
+  const micBtn   = document.getElementById('micBtn');
+  const micLabel = document.getElementById('micLabel');
+  let   recog    = null;
+
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recog = new SR();
+    recog.lang        = 'en-IN';
+    recog.continuous  = false;
+    recog.interimResults = true;
+
+    recog.onstart = () => {
+      micBtn.classList.add('active');
+      micBtn.textContent = '⏹️';
+      micLabel.textContent = '🔴 Listening... speak now!';
+    };
+    recog.onresult = e => {
+      const t = Array.from(e.results).map(r => r[0].transcript).join('');
+      document.getElementById('cmd').value = t;
+      if (e.results[e.results.length-1].isFinal) run(t);
+    };
+    recog.onerror = () => reset();
+    recog.onend   = () => reset();
+
+    micBtn.onclick = () => {
+      micBtn.classList.contains('active') ? recog.stop() : recog.start();
+    };
+  } else {
+    micBtn.style.opacity = '.4';
+    micLabel.textContent = '⚠️ Voice not supported — use Chrome browser';
+  }
+
+  function reset() {
+    micBtn.classList.remove('active');
+    micBtn.textContent   = '🎤';
+    micLabel.textContent = 'Click mic and speak your command';
+  }
+
+  // ── Send ────────────────────────────────────────────────────────────────────
+  function send() {
+    const v = document.getElementById('cmd').value.trim();
+    if (v) run(v);
+  }
+
+  document.getElementById('cmd').addEventListener('keydown', e => {
+    if (e.key === 'Enter') send();
+  });
+
+  async function run(cmd) {
+    document.getElementById('cmd').value = cmd;
+    setStatus('⏳', `Running: "${cmd}"`, 'info');
+
+    try {
+      const res  = await fetch('/api/command', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ command: cmd })
+      });
+      const data = await res.json();
+
+      if (data.action === 'open_url') {
+        window.open(data.url, '_blank');
+        setStatus('✅', data.label || 'Opened!', 'msg');
+        speak(data.label || 'Opening now');
+      } else if (data.action === 'speak') {
+        setStatus('🗣️', data.text, 'msg');
+        speak(data.text);
+      } else {
+        setStatus('❓', data.text || 'Unknown command', 'err');
+        speak(data.text || 'I did not understand that');
+      }
+
+      addHistory(cmd, data.label || data.text || '');
+    } catch (err) {
+      setStatus('❌', 'Server error: ' + err.message, 'err');
+    }
+  }
+
+  // ── TTS ─────────────────────────────────────────────────────────────────────
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-IN'; u.rate = 1.05; u.pitch = 1;
+    window.speechSynthesis.speak(u);
+  }
+
+  // ── UI helpers ───────────────────────────────────────────────────────────────
+  function setStatus(icon, msg, cls) {
+    document.getElementById('status').innerHTML =
+      `<span class="icon">${icon}</span><span class="${cls}">${msg}</span>`;
+  }
+
+  function addHistory(cmd, result) {
+    history.unshift({ cmd, result });
+    const ul = document.getElementById('history');
+    ul.innerHTML = history.slice(0,20).map(h => `
+      <li onclick="run('${h.cmd.replace(/'/g,"\\'")}')">
+        <span class="h-cmd">▶ ${h.cmd}</span>
+        <span class="h-res">${h.result}</span>
+      </li>`).join('');
+  }
+</script>
+</body>
+</html>

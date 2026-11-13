@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHAIK-AI Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #161b22, #21262d);
+    border-bottom: 1px solid #30363d;
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  header h1 { font-size: 1.6rem; color: #58a6ff; }
+  header span { font-size: 0.85rem; color: #8b949e; }
+  .status-dot {
+    width: 10px; height: 10px;
+    background: #3fb950;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+
+  /* ── Command Input ── */
+  .cmd-box {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .cmd-box h2 { color: #58a6ff; margin-bottom: 16px; font-size: 1rem; }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+  }
+  #cmd-input {
+    flex: 1;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #c9d1d9;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #cmd-input:focus { border-color: #58a6ff; }
+
+  .btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-send  { background: #238636; color: #fff; }
+  .btn-send:hover  { background: #2ea043; }
+  .btn-mic   { background: #da3633; color: #fff; font-size: 1.1rem; }
+  .btn-mic:hover   { background: #f85149; }
+  .btn-mic.active  { background: #f85149; animation: pulse 1s infinite; }
+
+  /* ── Quick Commands ── */
+  .quick { margin-bottom: 24px; }
+  .quick h2 { color: #58a6ff; font-size: 1rem; margin-bottom: 12px; }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #c9d1d9;
+  }
+  .chip:hover { background: #30363d; border-color: #58a6ff; color: #58a6ff; }
+
+  /* ── Result Box ── */
+  .result-box {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    min-height: 80px;
+    display: none;
+  }
+  .result-box.show { display: block; }
+  .result-box .label { font-size: 0.75rem; color: #8b949e; margin-bottom: 8px; }
+  .result-box .msg   { color: #3fb950; font-size: 1rem; }
+  .result-box .err   { color: #f85149; }
+  .result-box pre {
+    background: #0d1117;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 0.8rem;
+    color: #79c0ff;
+    overflow-x: auto;
+    margin-top: 10px;
+  }
+
+  /* ── History ── */
+  .history h2 { color: #58a6ff; font-size: 1rem; margin-bottom: 12px; }
+  #history-list { list-style: none; }
+  #history-list li {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #history-list li:hover { border-color: #58a6ff; }
+  .hi-cmd  { color: #c9d1d9; }
+  .hi-res  { color: #3fb950; font-size: 0.8rem; }
+  .hi-time { color: #8b949e; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="status-dot"></div>
+  <h1>🤖 SHAIK-AI</h1>
+  <span>Personal Voice OS Assistant — Web Dashboard</span>
+</header>
+
+<div class="container">
+
+  <!-- Command Input -->
+  <div class="cmd-box">
+    <h2>⌨️ Type a Command</h2>
+    <div class="input-row">
+      <input id="cmd-input" type="text" placeholder='e.g. "open Chrome", "go to YouTube", "send message to mom say hello"' />
+      <button class="btn btn-mic" id="mic-btn" title="Voice Input">🎤</button>
+      <button class="btn btn-send" onclick="sendCommand()">Send ▶</button>
+    </div>
+  </div>
+
+  <!-- Quick Commands -->
+  <div class="quick">
+    <h2>⚡ Quick Commands</h2>
+    <div class="chips">
+      <span class="chip" onclick="run('open Chrome')">🌐 Open Chrome</span>
+      <span class="chip" onclick="run('go to YouTube')">▶️ YouTube</span>
+      <span class="chip" onclick="run('go to gmail')">📧 Gmail</span>
+      <span class="chip" onclick="run('open downloads folder')">📁 Downloads</span>
+      <span class="chip" onclick="run('open documents')">📄 Documents</span>
+      <span class="chip" onclick="run('launch notepad')">📝 Notepad</span>
+      <span class="chip" onclick="run('open vs code')">💻 VS Code</span>
+      <span class="chip" onclick="run('search for cricket score')">🏏 Cricket Score</span>
+      <span class="chip" onclick="run('what time is it')">🕐 Time</span>
+      <span class="chip" onclick="run(\"what is today's date\")">📅 Date</span>
+      <span class="chip" onclick="run('weather in Hyderabad')">🌤️ Weather</span>
+      <span class="chip" onclick="run('volume up')">🔊 Volume Up</span>
+      <span class="chip" onclick="run('volume down')">🔉 Volume Down</span>
+      <span class="chip" onclick="run('mute')">🔇 Mute</span>
+      <span class="chip" onclick="run('take a screenshot')">📸 Screenshot</span>
+      <span class="chip" onclick="run('lock screen')">🔒 Lock Screen</span>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-box" id="result-box">
+    <div class="label">RESULT</div>
+    <div class="msg" id="result-msg"></div>
+    <pre id="result-json"></pre>
+  </div>
+
+  <!-- History -->
+  <div class="history">
+    <h2>🕘 Command History</h2>
+    <ul id="history-list"><li style="color:#8b949e;border:none">No commands yet.</li></ul>
+  </div>
+
+</div>
+
+<script>
+  // ── Send command ────────────────────────────────────────────────────────────
+  async function sendCommand() {
+    const input = document.getElementById('cmd-input');
+    const text  = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    await run(text);
+  }
+
+  async function run(cmd) {
+    document.getElementById('cmd-input').value = cmd;
+    const box  = document.getElementById('result-box');
+    const msg  = document.getElementById('result-msg');
+    const json = document.getElementById('result-json');
+
+    msg.textContent  = '⏳ Running: ' + cmd;
+    json.textContent = '';
+    box.className    = 'result-box show';
+
+    try {
+      const res  = await fetch('/command', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ command: cmd })
+      });
+      const data = await res.json();
+
+      if (data.status === 'unrecognised') {
+        msg.className   = 'msg err';
+        msg.textContent = '❌ ' + data.message;
+      } else {
+        msg.className   = 'msg';
+        msg.textContent = '✅ ' + data.message;
+        json.textContent = JSON.stringify(data.action, null, 2);
+      }
+      refreshHistory();
+    } catch (e) {
+      msg.className   = 'msg err';
+      msg.textContent = '❌ Error: ' + e.message;
+    }
+  }
+
+  // ── Enter key ───────────────────────────────────────────────────────────────
+  document.getElementById('cmd-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendCommand();
+  });
+
+  // ── Voice input (browser mic) ───────────────────────────────────────────────
+  const micBtn = document.getElementById('mic-btn');
+  let recognition = null;
+
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'en-IN';
+    recognition.continuous = false;
+
+    recognition.onresult = e => {
+      const text = e.results[0][0].transcript;
+      document.getElementById('cmd-input').value = text;
+      micBtn.classList.remove('active');
+      micBtn.textContent = '🎤';
+      run(text);
+    };
+    recognition.onerror = () => {
+      micBtn.classList.remove('active');
+      micBtn.textContent = '🎤';
+    };
+    recognition.onend = () => {
+      micBtn.classList.remove('active');
+      micBtn.textContent = '🎤';
+    };
+
+    micBtn.onclick = () => {
+      if (micBtn.classList.contains('active')) {
+        recognition.stop();
+      } else {
+        recognition.start();
+        micBtn.classList.add('active');
+        micBtn.textContent = '⏹️';
+      }
+    };
+  } else {
+    micBtn.title = 'Voice not supported in this browser. Use Chrome.';
+    micBtn.style.opacity = '0.4';
+  }
+
+  // ── History refresh ─────────────────────────────────────────────────────────
+  async function refreshHistory() {
+    const res  = await fetch('/history');
+    const data = await res.json();
+    const list = document.getElementById('history-list');
+    if (!data.length) return;
+
+    list.innerHTML = data.map(item => `
+      <li onclick="run('${item.command.replace(/'/g,"\\'")}')">
+        <span class="hi-cmd">▶ ${item.command}</span>
+        <span class="hi-res">${item.message || ''}</span>
+      </li>
+    `).join('');
+  }
+
+  setInterval(refreshHistory, 5000);
+</script>
+</body>
+</html>

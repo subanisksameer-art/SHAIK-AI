@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "▶ SHAIK-AI (Voice Mode)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": [],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "⌨ SHAIK-AI (Text/Keyboard Mode)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--text"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "🧪 SHAIK-AI (Test Command)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--test", "open Chrome"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
